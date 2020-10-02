@@ -25,13 +25,17 @@ import org.deeplearning4j.nn.conf.layers.SubsamplingLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
 import org.deeplearning4j.nn.weights.WeightInit;
 
+import org.deeplearning4j.text.sentenceiterator.BasicLineIterator;
+import org.deeplearning4j.text.sentenceiterator.SentenceIterator;
 import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.activations.Activation;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
+
 import org.nd4j.linalg.lossfunctions.LossFunctions;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -69,30 +73,36 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
     }
 
     private void createAndUseNetwork() {
-        int seed = 248;
-        MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
-                .seed(seed)
-                .weightInit(WeightInit.XAVIER)
-                .updater(Updater.ADAM)
-                .list()
-                .layer(new DenseLayer.Builder()
-                        .nIn(2)
-                        .nOut(3)
-                        .activation(Activation.RELU)
-                        .build())
-                .layer(new DenseLayer.Builder()
-                        .nOut(2)
-                        .activation(Activation.RELU)
-                        .build())
-                .layer(new OutputLayer.Builder(LossFunctions.LossFunction.XENT) //NEGATIVELOGLIKELIHOOD
-                        .weightInit(WeightInit.XAVIER)
-                        .activation(Activation.SIGMOID)
-                        .nOut(1).build())
-                .build();
-
-
-        MultiLayerNetwork model = new MultiLayerNetwork(conf);
-        model.init();
+//        int seed = 248;
+//        MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
+//                .seed(seed)
+//                .weightInit(WeightInit.XAVIER)
+//                .updater(Updater.ADAM)
+//                .list()
+//                .layer(new DenseLayer.Builder()
+//                        .nIn(2)
+//                        .nOut(3)
+//                        .activation(Activation.RELU)
+//                        .build())
+//                .layer(new DenseLayer.Builder()
+//                        .nOut(2)
+//                        .activation(Activation.RELU)
+//                        .build())
+//                .layer(new OutputLayer.Builder(LossFunctions.LossFunction.XENT) //NEGATIVELOGLIKELIHOOD
+//                        .weightInit(WeightInit.XAVIER)
+//                        .activation(Activation.SIGMOID)
+//                        .nOut(1).build())
+//                .build();
+//
+//
+//        MultiLayerNetwork model = new MultiLayerNetwork(conf);
+//        model.init();
+        String filePath = "raw_sentences.txt";
+        try {
+            SentenceIterator iter = new BasicLineIterator(filePath);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
     }
 
     private void loadNetExternal(INDArray input) {
