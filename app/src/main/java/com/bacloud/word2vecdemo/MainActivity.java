@@ -10,36 +10,29 @@ import android.util.Log;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import org.deeplearning4j.models.embeddings.loader.WordVectorSerializer;
+import org.deeplearning4j.models.word2vec.Word2Vec;
 import org.deeplearning4j.nn.api.Model;
-import org.deeplearning4j.nn.api.OptimizationAlgorithm;
-import org.deeplearning4j.nn.conf.ConvolutionMode;
-import org.deeplearning4j.nn.conf.MultiLayerConfiguration;
-import org.deeplearning4j.nn.conf.NeuralNetConfiguration;
-import org.deeplearning4j.nn.conf.Updater;
-import org.deeplearning4j.nn.conf.WorkspaceMode;
-import org.deeplearning4j.nn.conf.inputs.InputType;
-import org.deeplearning4j.nn.conf.layers.ConvolutionLayer;
-import org.deeplearning4j.nn.conf.layers.DenseLayer;
-import org.deeplearning4j.nn.conf.layers.OutputLayer;
-import org.deeplearning4j.nn.conf.layers.SubsamplingLayer;
 import org.deeplearning4j.nn.multilayer.MultiLayerNetwork;
-import org.deeplearning4j.nn.weights.WeightInit;
-
-import org.deeplearning4j.text.sentenceiterator.BasicLineIterator;
-import org.deeplearning4j.text.sentenceiterator.SentenceIterator;
 import org.deeplearning4j.util.ModelSerializer;
-import org.nd4j.linalg.activations.Activation;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 
-import org.nd4j.linalg.lossfunctions.LossFunctions;
-
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class MainActivity extends AppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -72,6 +65,8 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         thread.start();
     }
 
+    private final static int ngrams = 2;
+
     private void createAndUseNetwork() {
 //        int seed = 248;
 //        MultiLayerConfiguration conf = new NeuralNetConfiguration.Builder()
@@ -98,12 +93,54 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
 //        MultiLayerNetwork model = new MultiLayerNetwork(conf);
 //        model.init();
         String filePath = "raw_sentences.txt";
+        ArrayList<Collection<String>> emojisVectors = new ArrayList();
+        Word2Vec vec = WordVectorSerializer.readWord2VecModel(new File("pathToWriteto.txt"));
         try {
-            SentenceIterator iter = new BasicLineIterator(filePath);
-        } catch (FileNotFoundException e) {
+            FileInputStream fis = new FileInputStream("emojisVectors");
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            emojisVectors = (ArrayList<Collection<String>>) ois.readObject();
+            ois.close();
+            fis.close();
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+            return;
+        } catch (ClassNotFoundException c) {
+            System.out.println("Class not found");
+            c.printStackTrace();
+            return;
+        }
+        String emojisPath = "emojis.json";
+        JSONParser parser = new JSONParser();
+        ArrayList<String[]> rows = new ArrayList<String[]>();
+        try {
+            JSONArray jsonArray = (JSONArray) parser.parse(new FileReader(emojisPath));
+
+            for (int i = 0; i < jsonArray.size(); i++) {
+                JSONObject jsonobject = (JSONObject) jsonArray.get(i);
+                String[] row = new String[3];
+                row[0] = (String) jsonobject.get("name");
+                row[1] = (String) jsonobject.get("unicode");
+                JSONArray keywords = (JSONArray) jsonobject.get("keywords");
+                String row2 = "";
+                for (int j = 0; j < keywords.size(); j++) {
+                    row2 = row2 + " " + keywords.get(j);
+                }
+                row[2] = row2;
+                rows.add(row);
+            }
+        } catch (ParseException | FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
+
+        DLUtils.check(vec, emojisVectors, rows, "star");
+        DLUtils.check(vec, emojisVectors, rows, "nice people");
+        DLUtils.check(vec, emojisVectors, rows, "black man");
+        DLUtils.check(vec, emojisVectors, rows, "very excited");
+        DLUtils.check(vec, emojisVectors, rows, "skateboard snow");
     }
+
 
     private void loadNetExternal(INDArray input) {
         try {
