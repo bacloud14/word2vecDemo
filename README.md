@@ -2,6 +2,8 @@
 
 This is a demo application that is using the amazing DeepLearning library `deeplearning4j` on Android. Please read more about deployment of `dl4j` on Android, and why it is tricky and probably would not make it anyway !
 
+The Python solution here inspired me https://www.kaggle.com/aamaia/emojis-glove so thanks to **amaia**
+
 It simply tries to learn (word embedding) from a small sentences corpus, and predict similarity between emoji keywords and any input sentence in English.
 
 There are two challenges:
