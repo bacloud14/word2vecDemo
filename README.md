@@ -11,6 +11,20 @@ There are two challenges:
 - Exclude unused dependencies as possible.
 - Revise the model so it can be more accurate and performant (as any ML algorithm).
 
+# Dependencies and resources
+
+Of course the trained model would be ported to this demo app, and cannot be directly trained on a phone device, check this gist used to generate the model using `wikisent2.txt` from https://www.kaggle.com/mikeortman/wikipedia-sentences and `emojis.json` from https://www.kaggle.com/aamaia/emojis-glove/#data
+
+glove data sets can be huge and very much for this learning goal, if you want to train consider to split and test again for accuracy check 
+
+`cat wikisent2.txt | awk 'BEGIN{srand();}{print rand()"\t"$0}' | sort -k1 -n | cut -f2- > myfile.shuffled`
+
+`split -l 1000000 myfile.shuffled`
+
+Check the gist that generates Word2Vec model https://gist.github.com/bacloud14/5b4a6f8a730261d6d7fe6e77d5065139
+
+
+
 # Contribution
 
 Please see open issues for a specific issue, and do not hesitate to open any new issue (like better code, readability, modularity and best practice, performance, Android UI or even functionality enhancements...).
