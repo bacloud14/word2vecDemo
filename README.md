@@ -22,6 +22,7 @@ glove data sets can be huge and very much for this learning goal, if you want to
 `split -l 1000000 myfile.shuffled`
 
 Check the gist that generates Word2Vec model https://gist.github.com/bacloud14/5b4a6f8a730261d6d7fe6e77d5065139
+or https://github.com/bacloud14/text2emoji_backend
 
 
 
