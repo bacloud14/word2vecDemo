@@ -22,6 +22,7 @@ import org.json.simple.parser.ParseException;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -29,10 +30,12 @@ import java.io.FileOutputStream;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.stream.Collectors;
 
 public class MainActivity extends AppCompatActivity implements ActivityCompat.OnRequestPermissionsResultCallback {
 
@@ -93,8 +96,13 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
 //        MultiLayerNetwork model = new MultiLayerNetwork(conf);
 //        model.init();
         String filePath = "raw_sentences.txt";
+
         ArrayList<Collection<String>> emojisVectors = new ArrayList();
-        Word2Vec vec = WordVectorSerializer.readWord2VecModel(new File("pathToWriteto.txt"));
+
+        String modelPath = "pathToWriteto.txt";
+        File test = new File(this.getFilesDir().getAbsolutePath(), modelPath);
+        Word2Vec vec = WordVectorSerializer.readWord2VecModel(test);
+
         try {
             FileInputStream fis = new FileInputStream("emojisVectors");
             ObjectInputStream ois = new ObjectInputStream(fis);
@@ -139,6 +147,33 @@ public class MainActivity extends AppCompatActivity implements ActivityCompat.On
         DLUtils.check(vec, emojisVectors, rows, "black man");
         DLUtils.check(vec, emojisVectors, rows, "very excited");
         DLUtils.check(vec, emojisVectors, rows, "skateboard snow");
+    }
+
+    private String pathToString(String s) {
+        String content = null;
+        BufferedReader reader = null;
+        try {
+            reader = new BufferedReader(
+                    new InputStreamReader(getAssets().open(s)));
+
+            // do reading, usually loop until end of file reading
+//            String mLine;
+//            while ((mLine = reader.readLine()) != null) {
+//                //process line
+//            }
+            content = reader.lines().collect(Collectors.joining());
+        } catch (IOException e) {
+            //log the exception
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    //log the exception
+                }
+            }
+        }
+        return content;
     }
 
 
